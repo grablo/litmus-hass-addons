@@ -1,0 +1,53 @@
+# Litmus NVR — Home Assistant add-on manifest
+name: Litmus NVR
+version: "3.0.0"
+slug: litmus_nvr
+description: AI camera search and alerts for your existing IP cameras, next to Home Assistant
+url: https://litmusnvr.com
+arch:
+  - amd64
+  - aarch64
+
+# Pre-built image published by CI (see .github/workflows/build-addon.yml). The
+# Supervisor substitutes {arch} (amd64/aarch64) and pulls it — no on-device build.
+# The image tag tracks `version` above.
+image: "ghcr.io/litmusnvr/{arch}-addon-litmus-nvr"
+
+# litmus runs its own process (entrypoint) as the add-on's main process.
+init: false
+
+# WebRTC P2P + outbound MQTT need the host network.
+host_network: true
+
+# Grant the Supervisor-proxied Core API + inject SUPERVISOR_TOKEN, so Litmus can
+# talk to Home Assistant as an add-on WITHOUT the user creating a Long-Lived token.
+# (The controller auto-detects SUPERVISOR_TOKEN and uses http://supervisor/core/…;
+#  if the user configures an explicit host+LLAT, that takes priority — e.g. remote HA.)
+homeassistant_api: true
+
+# Supervisor injects PulseAudio → TTS / STT / media. (Verified working in a container.)
+audio: true
+
+# Device enumeration (USB hot-plug, V4L2 camera lookup).
+udev: true
+
+# Hardware access (no full_access / privileged needed):
+#   video: host video nodes /dev/video* — USB camera (AI video, V4L2)
+#   usb:   raw USB /dev/bus/usb + hot-plug
+#   uart:  serial / UART devices (Modbus RTU, Zigbee dongle), incl. /dev/serial/by-id
+video: true
+usb: true
+uart: true
+
+# Device identity, settings, models, keys and Zigbee pairing persist on the add-on's
+# /data volume (handled by the entrypoint), so they survive updates and restarts.
+# No options to configure — everything is set up in the Litmus web app.
+
+# ── Camera (AI vision) ───────────────────────────────────────────────────────
+# USB cameras work without full_access/privileged: the controller enumerates and
+# captures them via V4L2 (/dev/video*), exposed by `video: true` above.
+# (CSI cameras need libcamera + broad access — out of scope.)
+# If a specific camera still isn't detected, attach its node(s) explicitly:
+#   devices:
+#     - /dev/video0
+#     - /dev/media0

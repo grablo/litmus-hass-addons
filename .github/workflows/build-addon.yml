@@ -1,0 +1,85 @@
+name: build-addon
+
+# Build the Litmus NVR add-on image for amd64 + aarch64 and push to GHCR
+# (ghcr.io/litmusnvr/{arch}-addon-litmus-nvr), tagged with the version from litmus-nvr/config.yaml.
+#   - on a version tag push (v2.0.0, ...) -> publishes that release (the tag must match config.yaml)
+#   - manual run (workflow_dispatch) -> rebuilds the current config.yaml version
+# Requires releases/litmus/litmus-nvr_<version>_<arch>.deb on the CDN (the Dockerfile fetches it at build time).
+#
+#
+# Each architecture is a separate single-arch image (HA substitutes {arch} in the
+# add-on's `image:` and pulls the matching one). Built with Docker Buildx on native runners.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # The base must equal litmus-nvr/build.yaml build_from - this workflow passes it as BUILD_FROM itself.
+        include:
+          - arch: amd64
+            runner: ubuntu-latest
+            platform: linux/amd64
+            base: ghcr.io/home-assistant/amd64-base-debian:trixie
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+            platform: linux/arm64
+            base: ghcr.io/home-assistant/aarch64-base-debian:trixie
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: docker/setup-buildx-action@v4
+
+      - name: Read versions
+        id: meta
+        run: |
+          # image tag = add-on version (config.yaml); deb fetched = controller version (build.yaml)
+          v=$(sed -nE 's/^version: *"?([^"]+)"?.*/\1/p' litmus-nvr/config.yaml)
+          deb=$(sed -nE 's/^ *LITMUS_VERSION: *"?([^"]+)"?.*/\1/p' litmus-nvr/build.yaml)
+          case "$GITHUB_REF" in
+            refs/tags/*)
+              tag="${GITHUB_REF#refs/tags/}"
+              if [ "$tag" != "v$v" ]; then echo "tag $tag does not match litmus-nvr/config.yaml version $v" >&2; exit 1; fi ;;
+          esac
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+          echo "deb=$deb" >> "$GITHUB_OUTPUT"
+          echo "add-on version: $v  |  controller deb: $deb"
+
+      - name: Login to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push ${{ matrix.arch }}
+        uses: docker/build-push-action@v7
+        with:
+          context: litmus-nvr
+          platforms: ${{ matrix.platform }}
+          build-args: |
+            BUILD_FROM=${{ matrix.base }}
+            LITMUS_VERSION=${{ steps.meta.outputs.deb }}
+          tags: |
+            ghcr.io/litmusnvr/${{ matrix.arch }}-addon-litmus-nvr:${{ steps.meta.outputs.version }}
+            ghcr.io/litmusnvr/${{ matrix.arch }}-addon-litmus-nvr:latest
+          # io.hass.* labels mirror what home-assistant/builder produced, so the
+          # Supervisor treats the prebuilt image the same way.
+          labels: |
+            io.hass.name=Litmus NVR
+            io.hass.description=Litmus NVR add-on for Home Assistant
+            io.hass.arch=${{ matrix.arch }}
+            io.hass.type=addon
+            io.hass.url=https://litmusnvr.com
+            io.hass.version=${{ steps.meta.outputs.version }}
+          push: true
+          provenance: false

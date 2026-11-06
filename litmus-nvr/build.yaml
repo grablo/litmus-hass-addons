@@ -1,0 +1,22 @@
+# Architecture-specific HA base images (Debian trixie).
+#
+# Was bullseye on the theory that it had to match litmus's build ABI. Measured
+# 2026-09-22 — it does not: the binary needs at most GLIBC_2.30 (bullseye itself
+# ships 2.31), it bundles 64 of the 78 SONAMEs it needs in /usr/lib/litmus, and
+# all 14 it takes from the image resolve on trixie (libvlc.so.5 included —
+# trixie is still VLC 3.x). Full measurement in litmus-docker/Dockerfile.
+#
+# The move was forced: Debian 11 is oldoldstable and bullseye-security is
+# mid-migration to the archive — its index is still served while its pool is
+# empty, so apt fetches a 404 and the build dies (all four jobs, 2026-09-22).
+build_from:
+  amd64: ghcr.io/home-assistant/amd64-base-debian:trixie
+  aarch64: ghcr.io/home-assistant/aarch64-base-debian:trixie
+args:
+  LITMUS_VERSION: "3.0.0"
+labels:
+  org.opencontainers.image.title: "Litmus NVR"
+  org.opencontainers.image.source: "https://github.com/litmusnvr/litmus-hass-addons"
+  org.opencontainers.image.url: "https://litmusnvr.com"
+  org.opencontainers.image.vendor: "Litmus NVR"
+  org.opencontainers.image.licenses: "LicenseRef-Proprietary"
