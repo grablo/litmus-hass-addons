@@ -41,7 +41,7 @@ persist_to_data /var/lib/.syscache-litmus     syscache  # security key/salt
 persist_to_data /usr/lib/litmus/zigbee zigbee    # zigbee runtime + paired-device DB
 echo "[entrypoint] persistent dirs linked to ${DATA_DIR} (config/share/var/syscache/zigbee)"
 
-# 1c) Files that belong to the image, not to /data: the local screen (www/spot, port 8128), the message catalogs
+# 1c) Files that belong to the image, not to /data: the local screen (www/spot, port 8128), the default sounds, the message catalogs
 #     (locales/<code>.json — read by the controller, src/litmus-common/LocaleCatalog.h) and the edition marker
 #     (product.json — Litmus NVR add-on only). persist_to_data uses `cp -an` (never overwrites), so refresh them from
 #     the image on every start — otherwise an add-on update never reaches them.
@@ -49,6 +49,8 @@ SHARE=/usr/share/litmus
 if [ -d /opt/litmus-image ]; then
     rm -rf "$SHARE/www"
     [ -d /opt/litmus-image/www ] && cp -a /opt/litmus-image/www "$SHARE/www"
+    rm -rf "$SHARE/sounds"
+    [ -d /opt/litmus-image/sounds ] && cp -a /opt/litmus-image/sounds "$SHARE/sounds"
     rm -rf "$SHARE/locales"
     [ -d /opt/litmus-image/locales ] && cp -a /opt/litmus-image/locales "$SHARE/locales"
     if [ -f /opt/litmus-image/product.json ]; then

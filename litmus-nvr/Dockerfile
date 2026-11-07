@@ -37,11 +37,14 @@ RUN set -eux; \
     cp -a /tmp/litmus-root/usr/bin/litmus /usr/bin/; \
     cp -a /tmp/litmus-root/usr/lib/litmus /usr/lib/; \
     cp -a /tmp/litmus-root/usr/share/litmus /usr/share/; \
+    # License and copyright. Outside /data, so they always follow the image.
+    cp -a /tmp/litmus-root/usr/share/doc/litmus /usr/share/doc/ 2>/dev/null || true; \
     # Image-owned copy: the entrypoint moves /usr/share/litmus onto /data (models, face DB) with `cp -an`, which never
-    # overwrites — the local screen (www/spot), the message catalogs (locales/<code>.json) and the edition marker
+    # overwrites — the local screen (www/spot), the default sounds (sounds), the message catalogs (locales/<code>.json) and the edition marker
     # (product.json) would stay at the first install's version. The entrypoint refreshes them from here on every start.
     mkdir -p /opt/litmus-image; \
     cp -a /tmp/litmus-root/usr/share/litmus/www /opt/litmus-image/www 2>/dev/null || true; \
+    cp -a /tmp/litmus-root/usr/share/litmus/sounds /opt/litmus-image/sounds 2>/dev/null || true; \
     cp -a /tmp/litmus-root/usr/share/litmus/locales /opt/litmus-image/locales 2>/dev/null || true; \
     cp -a /tmp/litmus-root/usr/share/litmus/product.json /opt/litmus-image/product.json 2>/dev/null || true; \
     rm -rf /tmp/litmus.deb /tmp/litmus-root; \
