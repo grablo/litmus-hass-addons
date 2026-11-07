@@ -1,7 +1,7 @@
 name: build-addon
 
 # Build the Litmus NVR add-on image for amd64 + aarch64 and push to GHCR
-# (ghcr.io/litmusnvr/{arch}-addon-litmus-nvr), tagged with the version from litmus-nvr/config.yaml.
+# (ghcr.io/grablo/{arch}-addon-litmus-nvr), tagged with the version from litmus-nvr/config.yaml.
 #   - on a version tag push (v2.0.0, ...) -> publishes that release (the tag must match config.yaml)
 #   - manual run (workflow_dispatch) -> rebuilds the current config.yaml version
 # Requires releases/litmus/litmus-nvr_<version>_<arch>.deb on the CDN (the Dockerfile fetches it at build time).
@@ -70,8 +70,8 @@ jobs:
             BUILD_FROM=${{ matrix.base }}
             LITMUS_VERSION=${{ steps.meta.outputs.deb }}
           tags: |
-            ghcr.io/litmusnvr/${{ matrix.arch }}-addon-litmus-nvr:${{ steps.meta.outputs.version }}
-            ghcr.io/litmusnvr/${{ matrix.arch }}-addon-litmus-nvr:latest
+            ghcr.io/grablo/${{ matrix.arch }}-addon-litmus-nvr:${{ steps.meta.outputs.version }}
+            ghcr.io/grablo/${{ matrix.arch }}-addon-litmus-nvr:latest
           # io.hass.* labels mirror what home-assistant/builder produced, so the
           # Supervisor treats the prebuilt image the same way.
           labels: |

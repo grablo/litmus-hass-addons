@@ -11,7 +11,7 @@ arch:
 # Pre-built image published by CI (see .github/workflows/build-addon.yml). The
 # Supervisor substitutes {arch} (amd64/aarch64) and pulls it — no on-device build.
 # The image tag tracks `version` above.
-image: "ghcr.io/litmusnvr/{arch}-addon-litmus-nvr"
+image: "ghcr.io/grablo/{arch}-addon-litmus-nvr"
 
 # litmus runs its own process (entrypoint) as the add-on's main process.
 init: false
