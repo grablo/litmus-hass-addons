@@ -18,5 +18,5 @@ labels:
   org.opencontainers.image.title: "Litmus NVR"
   org.opencontainers.image.source: "https://github.com/grablo/litmus-hass-addons"
   org.opencontainers.image.url: "https://litmusnvr.com"
-  org.opencontainers.image.vendor: "Litmus NVR"
+  org.opencontainers.image.vendor: "Grablo Inc."
   org.opencontainers.image.licenses: "LicenseRef-Proprietary"
