@@ -13,7 +13,7 @@ build_from:
   amd64: ghcr.io/home-assistant/amd64-base-debian:trixie
   aarch64: ghcr.io/home-assistant/aarch64-base-debian:trixie
 args:
-  LITMUS_VERSION: "2.2.1"
+  LITMUS_VERSION: "2.3.0"
 labels:
   org.opencontainers.image.title: "Litmus NVR"
   org.opencontainers.image.source: "https://github.com/grablo/litmus-hass-addons"
