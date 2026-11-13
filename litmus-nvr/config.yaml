@@ -19,6 +19,16 @@ init: false
 # WebRTC P2P + outbound MQTT need the host network.
 host_network: true
 
+# Open the Litmus screen inside Home Assistant (sidebar), as the Frigate add-on does.
+# HA proxies /api/hassio_ingress/<token>/ to this port; the controller trusts only
+# ingress requests from the Supervisor (172.30.32.2) and skips the local login for
+# them (HA has already signed the user in — admins only, panel_admin defaults to true).
+# Controller 2.4.0+ (older images show the login screen inside the panel).
+ingress: true
+ingress_port: 8128
+panel_icon: mdi:cctv
+panel_title: Litmus NVR
+
 # Grant the Supervisor-proxied Core API + inject SUPERVISOR_TOKEN, so Litmus can
 # talk to Home Assistant as an add-on WITHOUT the user creating a Long-Lived token.
 # (The controller auto-detects SUPERVISOR_TOKEN and uses http://supervisor/core/…;
