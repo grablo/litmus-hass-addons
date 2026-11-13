@@ -1,6 +1,6 @@
 # Litmus NVR — Home Assistant add-on manifest
 name: Litmus NVR
-version: "2.3.0"
+version: "2.3.1"
 slug: litmus_nvr
 description: AI camera search and alerts for your existing IP cameras, next to Home Assistant
 url: https://litmusnvr.com

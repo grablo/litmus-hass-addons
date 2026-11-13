@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.3.1
+
+- Fixes: camera reconnection messages in the error list now appear in your language.
+
 ## 2.3.0
 
 - Automatic camera discovery: Add camera lists the cameras found on your network, checks the connection and shows a picture and the resolution.
