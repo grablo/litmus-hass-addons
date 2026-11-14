@@ -24,16 +24,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # The base must equal litmus-nvr/build.yaml build_from - this workflow passes it as BUILD_FROM itself.
+        # The base image is the Dockerfile's FROM (multi-arch ghcr.io/home-assistant/base-debian).
         include:
           - arch: amd64
             runner: ubuntu-latest
             platform: linux/amd64
-            base: ghcr.io/home-assistant/amd64-base-debian:trixie
           - arch: aarch64
             runner: ubuntu-24.04-arm
             platform: linux/arm64
-            base: ghcr.io/home-assistant/aarch64-base-debian:trixie
     steps:
       - uses: actions/checkout@v6
 
@@ -42,9 +40,10 @@ jobs:
       - name: Read versions
         id: meta
         run: |
-          # image tag = add-on version (config.yaml); deb fetched = controller version (build.yaml)
+          # image tag = add-on version (config.yaml); deb fetched = controller version (Dockerfile ARG LITMUS_VERSION)
           v=$(sed -nE 's/^version: *"?([^"]+)"?.*/\1/p' litmus-nvr/config.yaml)
-          deb=$(sed -nE 's/^ *LITMUS_VERSION: *"?([^"]+)"?.*/\1/p' litmus-nvr/build.yaml)
+          deb=$(sed -nE 's/^ARG LITMUS_VERSION="?([^"]+)"?.*/\1/p' litmus-nvr/Dockerfile)
+          [ -n "$deb" ] || { echo "LITMUS_VERSION not found in litmus-nvr/Dockerfile" >&2; exit 1; }
           case "$GITHUB_REF" in
             refs/tags/*)
               tag="${GITHUB_REF#refs/tags/}"
@@ -67,7 +66,6 @@ jobs:
           context: litmus-nvr
           platforms: ${{ matrix.platform }}
           build-args: |
-            BUILD_FROM=${{ matrix.base }}
             LITMUS_VERSION=${{ steps.meta.outputs.deb }}
           tags: |
             ghcr.io/grablo/${{ matrix.arch }}-addon-litmus-nvr:${{ steps.meta.outputs.version }}
