@@ -16,6 +16,11 @@ image: "ghcr.io/grablo/{arch}-addon-litmus-nvr"
 # litmus runs its own process (entrypoint) as the add-on's main process.
 init: false
 
+# Restart the add-on when Litmus stops answering (hang) or exits (crash, out of memory) — once the user turns on Watchdog
+# (Supervisor default off). The health route answers while stopped too, so a stopped NVR is not restarted. Frigate's add-on does
+# the same (`watchdog: http://[HOST]:[PORT:5000]/`). 2026-11-14 HAOS 18.4 test: killed for memory, the add-on stayed down.
+watchdog: "http://[HOST]:[PORT:8128]/api/v1/health"
+
 # WebRTC P2P + outbound MQTT need the host network.
 host_network: true
 
@@ -33,9 +38,10 @@ panel_title: Litmus NVR
 # Litmus (the add-on image has no mDNS responder, so zeroconf cannot find it). The controller
 # (2.4.0+) posts {host, port, id} to the Supervisor discovery API; the Litmus NVR integration
 # picks it up in async_step_hassio — the way the Mosquitto and Z-Wave JS add-ons are found.
+# No hassio_api needed: the Supervisor lets every add-on call /discovery and /addons/self/info
+# (supervisor api/middleware/security.py api_bypass; checked on HAOS 18.4 without it, 2026-11-14).
 discovery:
   - litmus_nvr
-hassio_api: true
 
 # Grant the Supervisor-proxied Core API + inject SUPERVISOR_TOKEN, so Litmus can
 # talk to Home Assistant as an add-on WITHOUT the user creating a Long-Lived token.
