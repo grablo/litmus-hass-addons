@@ -29,6 +29,14 @@ ingress_port: 8128
 panel_icon: mdi:cctv
 panel_title: Litmus NVR
 
+# Show up under Settings › Devices & services › Discovered when Home Assistant is turned on in
+# Litmus (the add-on image has no mDNS responder, so zeroconf cannot find it). The controller
+# (2.4.0+) posts {host, port, id} to the Supervisor discovery API; the Litmus NVR integration
+# picks it up in async_step_hassio — the way the Mosquitto and Z-Wave JS add-ons are found.
+discovery:
+  - litmus_nvr
+hassio_api: true
+
 # Grant the Supervisor-proxied Core API + inject SUPERVISOR_TOKEN, so Litmus can
 # talk to Home Assistant as an add-on WITHOUT the user creating a Long-Lived token.
 # (The controller auto-detects SUPERVISOR_TOKEN and uses http://supervisor/core/…;
