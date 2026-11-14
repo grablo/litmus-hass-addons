@@ -16,6 +16,10 @@ After the add-on starts, **Litmus NVR** appears in the Home Assistant sidebar (t
 
 Live video in the sidebar connects straight to this machine, so it works when Home Assistant is opened on your home network. Talking through a camera needs Home Assistant opened over HTTPS (a browser rule for the microphone).
 
+## Restart automatically
+
+Turn on **Watchdog** on the add-on page. Home Assistant then restarts Litmus NVR if it stops or stops responding.
+
 ## Support
 
 - Website: https://litmusnvr.com
