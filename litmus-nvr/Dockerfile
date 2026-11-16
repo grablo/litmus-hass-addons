@@ -1,10 +1,20 @@
 # Litmus NVR — HA add-on image.
-# Built on the HA base (build.yaml) using the same recipe as the standalone image:
+# Built on the HA Debian base using the same recipe as the standalone image:
 # fetch the public release .deb and extract it (install scripts are not run).
-ARG BUILD_FROM
-FROM ${BUILD_FROM}
+# Base, build arguments and labels live here, not in build.yaml (deprecated — the Supervisor warns and the new builder does not
+# read it; https://developers.home-assistant.io/blog/2026/04/02/builder-migration/). The base is published multi-arch
+# (amd64 · arm64), so one FROM serves both; the Supervisor no longer passes BUILD_FROM (2026.04.0+).
+FROM ghcr.io/home-assistant/base-debian:trixie
 
-ARG LITMUS_VERSION=2.2.1
+# Controller .deb to fetch (releases/litmus/litmus-nvr_<version>_<arch>.deb). CI reads it from this line.
+ARG LITMUS_VERSION="2.4.0"
+
+LABEL org.opencontainers.image.title="Litmus NVR" \
+      org.opencontainers.image.source="https://github.com/grablo/litmus-hass-addons" \
+      org.opencontainers.image.url="https://litmusnvr.com" \
+      org.opencontainers.image.vendor="Grablo Inc." \
+      org.opencontainers.image.licenses="LicenseRef-Proprietary"
+
 ENV DEBIAN_FRONTEND=noninteractive \
     LD_LIBRARY_PATH=/usr/lib/litmus \
     GRABLO_CONTAINER=1 \
