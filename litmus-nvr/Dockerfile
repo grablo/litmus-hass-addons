@@ -33,7 +33,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       libfreetype6 mosquitto ca-certificates curl \
       libxcursor1 libxinerama1 libxrandr2 libxi6 libwayland-cursor0 \
       libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 \
+      tzdata \
  && rm -rf /var/lib/apt/lists/*
+# ★ tzdata(2.5.0 장치 시간대) — Supervisor 가 넣는 `TZ`(HA 의 시간대)를 읽으려면 zoneinfo 파일이 있어야 한다. 없으면 UTC 로 돌아
+#   녹화 파일 이름·알림 시간대·스케줄이 HA 시간대와 어긋난다.
 # ★ libxi6 는 2026-09-22 trixie 전환에서 **명시로 옮긴 것**이다. bullseye 에서는
 #   다른 패키지의 전이 의존으로 딸려와 목록에 없어도 됐는데, trixie 에서 그 체인이
 #   끊겨 `libXi.so.6 => not found` 가 났다(본체와 미디어 라이브러리 둘 다).
