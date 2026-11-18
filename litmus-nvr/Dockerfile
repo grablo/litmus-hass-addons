@@ -7,7 +7,7 @@
 FROM ghcr.io/home-assistant/base-debian:trixie
 
 # Controller .deb to fetch (releases/litmus/litmus-nvr_<version>_<arch>.deb). CI reads it from this line.
-ARG LITMUS_VERSION="2.4.0"
+ARG LITMUS_VERSION="2.5.0"
 
 LABEL org.opencontainers.image.title="Litmus NVR" \
       org.opencontainers.image.source="https://github.com/grablo/litmus-hass-addons" \

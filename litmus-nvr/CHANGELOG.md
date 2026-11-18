@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.5.0
+
+- Play media and Read text can play on this computer's speaker or on a camera's speaker.
+- Device time zone: recordings, alert times and schedules follow your time zone (Home Assistant's time zone is used).
+- When the disk is almost full, recording pauses with a notice and resumes when space is freed.
+- Alerts you turned off stay off after a restart.
+- Fixes: H.265 clip export plays, the timeline opens on the first try, Zigbee device management, opening Litmus at homeassistant.local, and more.
+
 ## 2.4.0
 
 - Home Assistant integration: cameras, detection sensors, alerts and recordings in Home Assistant. Turn it on in Litmus › Settings › Integrations, and Litmus appears under Settings › Devices & services › Discovered.
